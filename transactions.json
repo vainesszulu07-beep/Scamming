@@ -1,0 +1,23 @@
+{
+  "balance": 2,
+  "current": {
+    "transaction_id": "LPTXN25122715144719798",
+    "phone": "0972084538",
+    "amount": 1,
+    "status": "successful",
+    "verify_response": {
+      "message": "Transaction processed Successfully",
+      "data": {
+        "status": "successful",
+        "amount": "1.00",
+        "transaction_id": "LPTXN25122715144719798",
+        "charges": "0.04",
+        "from_payer": "260972084538"
+      },
+      "isError": false
+    },
+    "completed": true,
+    "created_at": "2025-12-27T13:14:50.262Z",
+    "last_checked": "2025-12-27T13:15:35.125Z"
+  }
+}

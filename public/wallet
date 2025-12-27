@@ -1,0 +1,53 @@
+<form id="payment-form">
+  <input type="text" id="phone" placeholder="Phone number" required />
+  <input type="number" id="amount" placeholder="Amount" step="0.01" required />
+  <button type="submit" id="deposit-btn">Deposit</button>
+</form>
+
+<div id="payment-message" style="margin-top: 10px; color: green; font-weight: bold;"></div>
+
+<script>
+document.getElementById('payment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const phone = document.getElementById('phone').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+  const depositBtn = document.getElementById('deposit-btn');
+  const msgDiv = document.getElementById('payment-message');
+
+  // Disable button and show pending message
+  depositBtn.disabled = true;
+  msgDiv.textContent = "Your transaction is pending. Please wait, USSD will appear soon...";
+
+  try {
+    const res = await fetch('/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, amount })
+    });
+
+    const result = await res.json();
+    console.log('Payment result:', result);
+
+    // Optionally, you can show transaction ID
+    if(result.transaction_id){
+      msgDiv.textContent = `Transaction ${result.transaction_id} is pending. Please wait for verification...`;
+    }
+
+    // Clear form
+    document.getElementById('phone').value = '';
+    document.getElementById('amount').value = '';
+
+  } catch (err) {
+    msgDiv.style.color = "red";
+    msgDiv.textContent = "Payment failed. Try again.";
+    console.error('Payment failed:', err);
+  } finally {
+    // Keep button disabled until backend verification updates status (or optional: re-enable after some time)
+    setTimeout(() => {
+      depositBtn.disabled = false;
+      msgDiv.textContent = ""; // clear message after a delay
+    }, 10000); // 10 seconds, or adjust as needed
+  }
+});
+</script>
