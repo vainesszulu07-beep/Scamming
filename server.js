@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 🔐 PUT YOUR REAL AUTH ID HERE
 const AUTH_ID = "01KDERAAGTFHCFMNMZ6S0R3EVH";
@@ -13,6 +13,13 @@ const DATA_FILE = path.join(__dirname, "transactions.json");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+/* ======================
+   ROOT ROUTE (FIXES Cannot GET /)
+====================== */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "wallet.html"));
+});
 
 /* ======================
    SAFE JSON HANDLING
@@ -55,7 +62,7 @@ app.post("/pay", async (req, res) => {
 
     const apiData = apiRes.data;
 
-    // MoneyUnify returns transaction_id INSIDE data
+    // MoneyUnify returns transaction_id inside data
     const txId = apiData?.data?.transaction_id;
 
     if (!txId) {
@@ -65,7 +72,6 @@ app.post("/pay", async (req, res) => {
       });
     }
 
-    // Save ONLY this transaction
     saveData({
       balance: readData().balance,
       current: {
@@ -117,11 +123,9 @@ async function verifyCurrentTransaction() {
 
     const result = verifyRes.data;
 
-    // Store RAW verify response for GUI
     tx.verify_response = result;
     tx.last_checked = new Date().toISOString();
 
-    // Extract status safely
     const status =
       result?.data?.status ||
       result?.status ||
@@ -129,7 +133,6 @@ async function verifyCurrentTransaction() {
 
     tx.status = status;
 
-    // ✅ FINAL STATES
     if (status === "successful") {
       store.balance += tx.amount;
       tx.completed = true;
@@ -148,7 +151,7 @@ async function verifyCurrentTransaction() {
   }
 }
 
-// 🔁 Poll every 3 seconds
+// 🔁 Verify every 3 seconds
 setInterval(verifyCurrentTransaction, 3000);
 
 /* ======================
@@ -164,7 +167,7 @@ app.get("/status", (req, res) => {
   res.json({
     status: store.current.status,
     verify_response: store.current.verify_response,
-    balance: store.balance // ✅ include balance here
+    balance: store.balance
   });
 });
 
@@ -172,5 +175,5 @@ app.get("/status", (req, res) => {
    START SERVER
 ====================== */
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
