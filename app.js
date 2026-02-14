@@ -1,30 +1,25 @@
-import express from "express";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+import express from 'express';
+import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, "public")));
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(process.cwd(), 'public')));
 
-// Homepage
-app.get("/", (req, res) => {
-  res.sendFile("login.html", { root: path.join(__dirname, "public") });
+// Root route -> serve login.html from public
+app.get('/', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'login.html'));
 });
 
-// Optional: simple route to test server is running
-app.get("/ping", (req, res) => {
-  res.send("Server is up ✅");
+// Health check route
+app.get('/health', (req, res) => {
+  res.send('Server is running!');
 });
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

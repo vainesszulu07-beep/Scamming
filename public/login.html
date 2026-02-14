@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Login - Supabase</title>
+  <title>Google Login</title>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       text-align: center;
       padding-top: 100px;
       background-color: #f2f2f2;
     }
-
     #google-login {
       background-color: #4285F4;
       color: white;
@@ -21,12 +20,12 @@
       border-radius: 10px;
       cursor: pointer;
       box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+      transition: 0.2s;
     }
-
     #google-login:hover {
       background-color: #357ae8;
+      transform: scale(1.05);
     }
-
     #debug {
       margin-top: 40px;
       background: white;
@@ -34,75 +33,57 @@
       border-radius: 10px;
       width: 90%;
       max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
+      margin: auto;
       text-align: left;
       font-size: 16px;
       color: green;
     }
   </style>
 </head>
-
 <body>
 
 <h2>Login with Google</h2>
-
 <button id="google-login">🚀 Login with Google</button>
-
 <div id="debug"></div>
 
 <!-- Supabase JS CDN -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", async function () {
-  const debug = document.getElementById("debug");
-  function log(msg) { debug.innerHTML += "<p>" + msg + "</p>"; }
+  document.addEventListener("DOMContentLoaded", () => {
+    const debug = document.getElementById("debug");
+    function log(msg) {
+      debug.innerHTML += `<p>${msg}</p>`;
+    }
 
-  log("DOM loaded");
+    log("DOM loaded");
 
-  if (!window.supabase) {
-    log("Supabase failed to load!");
-    return;
-  }
+    // Initialize Supabase client with your project's URL and anon key
+    const supabaseClient = supabase.createClient(
+      "https://eimecuiixwgmpfpedxpr.supabase.co", // Your Supabase URL
+      "sb_publishable_yFjk-cShSqVzlQye7DqRdg_F3AJ39ou" // Your anon key
+    );
 
-  // Initialize Supabase client
-  const supabaseClient = window.supabase.createClient(
-    "https://eimecuiixwgmpfpedxpr.supabase.co",
-    "sb_publishable_yFjk-cShSqVzlQye7DqRdg_F3AJ39ou" // replace with your anon key
-  );
+    log("✅ Supabase client created");
 
-  log("Supabase client created");
+    // Handle Google login button click
+    const loginBtn = document.getElementById("google-login");
+    loginBtn.addEventListener("click", async () => {
+      log("Button clicked");
 
-  // Check if user is already logged in
-  const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-  if (sessionError) log("Session error: " + sessionError.message);
-  if (session) {
-    log("User already logged in! Redirecting to app...");
-    // Change this to your app's main page
-    window.location.href = "/profile.html"; 
-    return;
-  }
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "https://scam-gamma.vercel.app/" // Your deployed app URL
+        }
+      });
 
-  // Google login button
-  document.getElementById("google-login").addEventListener("click", async function () {
-    log("Button clicked");
-
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://eimecuiixwgmpfpedxpr.supabase.co/auth/v1/callback"
+      if (error) {
+        log("❌ OAuth error: " + error.message);
+      } else {
+        log("Redirecting to Google...");
       }
     });
-
-    if (error) {
-      log("OAuth error: " + error.message);
-    } else {
-      log("Redirecting to Google...");
-    }
   });
-});
 </script>
 
 </body>
