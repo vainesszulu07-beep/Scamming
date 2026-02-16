@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password - Supabase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 40px;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    #reset-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 35px 25px;
+      margin: 30px 0;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 15px;
+      margin: 12px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      transition: border 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #16a085;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 0;
+      border: none;
+      border-radius: 12px;
+      background: #16a085;
+      color: #fff;
+      font-weight: 500;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #13876d;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 15px;
+      color: #e74c3c;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      color: #16a085;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Reset Your Password</h1>
+
+  <div id="reset-card">
+    <input type="password" id="new-password" placeholder="New Password" />
+    <button id="resetBtn">Reset Password</button>
+    <div id="message"></div>
+    <a href="email.html">← Back to Email Login</a>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      "https://eimecuiixwgmpfpedxpr.supabase.co",
+      "sb_publishable_yFjk-cShSqVzlQye7DqRdg_F3AJ39ou"
+    );
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const access_token = urlParams.get("access_token");
+    const newPasswordInput = document.getElementById("new-password");
+    const resetBtn = document.getElementById("resetBtn");
+    const messageDiv = document.getElementById("message");
+
+    resetBtn.addEventListener("click", async () => {
+      const newPassword = newPasswordInput.value.trim();
+      if (!newPassword) return messageDiv.textContent = "Please enter a new password.";
+
+      const { error } = await supabase.auth.updateUser(
+        { password: newPassword },
+        { accessToken: access_token }
+      );
+
+      if (error) {
+        messageDiv.textContent = "Error resetting password: " + error.message;
+        messageDiv.style.color = "#e74c3c";
+      } else {
+        messageDiv.textContent = "Password reset successfully! You can now log in.";
+        messageDiv.style.color = "#16a085";
+      }
+    });
+  </script>
+
+</body>
+</html>
