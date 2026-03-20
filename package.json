@@ -11,6 +11,6 @@
     "cors": "^2.8.5",
     "socket.io": "^4.7.2",
     "jsonwebtoken": "^9.0.0",
-    "node-fetch": "^3.4.0"
+    "node-fetch": "^3"
   }
 }
