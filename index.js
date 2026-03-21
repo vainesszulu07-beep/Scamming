@@ -62,7 +62,7 @@ app.post("/api/create-room", async (req, res) => {
     const roomResponse = await fetch("https://api.videosdk.live/v2/rooms", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${serverToken}`, // MUST include Bearer
+        "Authorization": serverToken, // MUST include Bearer
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
